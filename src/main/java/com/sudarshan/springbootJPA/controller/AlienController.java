@@ -28,7 +28,14 @@ public class AlienController {
     @RequestMapping("/getAlien")
     public ModelAndView getAlien(@RequestParam int aid){
         ModelAndView mv = new ModelAndView("showalien.jsp");
-        Alien alien = repo.findById(aid).orElse(new Alien());
+        //Alien alien = repo.findById(aid).orElse(new Alien());
+        System.out.println("findByTech:"+repo.findByTech("java"));
+        System.out.println("findByName:"+repo.findByAname("shriyansh"));
+        System.out.println("findByAidGreaterThan:"+repo.findByAidGreaterThan(aid));
+        Alien alien = (Alien) repo.findByAidGreaterThan(aid);
+        System.out.println("findByAidLessThan"+repo.findByAidLessThan(aid));
+        System.out.println("findByTechSorted:"+repo.findByTechSorted("java"));
+
         mv.addObject(alien);
         return mv;
     }
