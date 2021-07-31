@@ -3,12 +3,12 @@ package com.sudarshan.springbootJPA.controller;
 import com.sudarshan.springbootJPA.dao.AlienRepo;
 import com.sudarshan.springbootJPA.model.Alien;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+import java.util.List;
+import java.util.Optional;
+
+@RestController
 public class AlienController {
 
     @Autowired
@@ -19,24 +19,38 @@ public class AlienController {
         return "home.jsp";
     }
 
-    @RequestMapping("/addAlien")
-    public String addAlien(Alien alien){
+    @PostMapping("/alien")//Post method mapping data used for save new data entry only
+    public Alien addAliens(@RequestBody Alien alien){
+        System.out.println("PostMapping");
         repo.save(alien);
-        return "home.jsp";
+        return alien;
     }
 
-    @RequestMapping("/getAlien")
-    public ModelAndView getAlien(@RequestParam int aid){
-        ModelAndView mv = new ModelAndView("showalien.jsp");
-        //Alien alien = repo.findById(aid).orElse(new Alien());
-        System.out.println("findByTech:"+repo.findByTech("java"));
-        System.out.println("findByName:"+repo.findByAname("shriyansh"));
-        System.out.println("findByAidGreaterThan:"+repo.findByAidGreaterThan(aid));
-        Alien alien = (Alien) repo.findByAidGreaterThan(aid);
-        System.out.println("findByAidLessThan"+repo.findByAidLessThan(aid));
-        System.out.println("findByTechSorted:"+repo.findByTechSorted("java"));
+    @DeleteMapping("/alien/{aid}")//Delete Method mapping for delete specific record
+    public String deleteALien(@PathVariable int aid){//mapping url parameter use PathVariable
+        System.out.println("DeleteMapping");
+        Alien a = repo.getOne(aid);
+        repo.delete(a);
+        return "deleted";
+    }
 
-        mv.addObject(alien);
-        return mv;
+    @GetMapping(value = "/aliens") //, produces = {"application/xml"}//Get Method mapping both XML and JSON Data
+    public List<Alien> getAliens(){
+        System.out.println("GetMapping");
+        return repo.findAll();
+    }
+
+    @PutMapping(path = "/alien",consumes = {"application/json"})//Put method mapping for specific json data add or update
+    public Alien saveOrUpdate(@RequestBody Alien alien){
+        System.out.println("PutMapping");
+        repo.save(alien);
+        return alien;
+    }
+
+    @RequestMapping("/alien/{aid}")//Get/Post Request Method without rest controller
+    @ResponseBody//When only response is fetched with @Controller
+    public Optional<Alien> getAlien(@PathVariable("aid") int aid){
+        System.out.println("RequestMapping /alien/{aid}");
+        return repo.findById(aid);
     }
 }
